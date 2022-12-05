@@ -1,0 +1,8 @@
+name: Warps
+version: '${version}'
+main: fr.tetemh.warps.Warps
+api-version: 1.19
+authors: [ tetemh ]
+commands:
+  warps:
+    description: all commands for warps

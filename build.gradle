@@ -1,0 +1,69 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
+shadowJar {
+    relocate 'fr.mrmicky.fastboard', 'fr.citeevent.randomrace.fastboard'
+    relocate 'fr.mrmicky.fastinv', 'fr.citeevent.randomrace.fastinv'
+}
+
+group = 'fr.tetemh'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+
+    implementation 'org.jetbrains:annotations:20.1.0'
+    compileOnly'org.spigotmc:spigot:1.19.2-R0.1-SNAPSHOT'
+
+    implementation 'fr.mrmicky:FastInv:3.0.3'
+    implementation 'fr.mrmicky:fastboard:1.2.1'
+
+    //BDD
+    //implementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1'
+//    implementation group: 'io.dropwizard.metrics', name: 'metrics-healthchecks', version: '3.1.2'
+
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.0.8'
+}
+
+//sourceCompatibility = targetCompatibility = '17'
+//compileJava.options.encoding = 'UTF-8'
+setLibsDirName('../build')
+
+def targetJavaVersion = 17
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+artifacts {
+    archives shadowJar
+}
+
+compileJava.options.encoding = 'UTF-8'
